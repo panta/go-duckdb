@@ -120,12 +120,20 @@ func scan(vector C.duckdb_vector, rowIdx C.idx_t) (any, error) {
 		return nil, errInvalidType
 	case C.DUCKDB_TYPE_BOOLEAN:
 		return get[bool](vector, rowIdx), nil
+	case C.DUCKDB_TYPE_UTINYINT:
+		return get[uint8](vector, rowIdx), nil
 	case C.DUCKDB_TYPE_TINYINT:
 		return get[int8](vector, rowIdx), nil
+	case C.DUCKDB_TYPE_USMALLINT:
+		return get[uint16](vector, rowIdx), nil
 	case C.DUCKDB_TYPE_SMALLINT:
 		return get[int16](vector, rowIdx), nil
+	case C.DUCKDB_TYPE_UINTEGER:
+		return uint64(get[uint32](vector, rowIdx)), nil
 	case C.DUCKDB_TYPE_INTEGER:
 		return int64(get[int32](vector, rowIdx)), nil
+	case C.DUCKDB_TYPE_UBIGINT:
+		return get[uint64](vector, rowIdx), nil
 	case C.DUCKDB_TYPE_BIGINT:
 		return get[int64](vector, rowIdx), nil
 	case C.DUCKDB_TYPE_HUGEINT:
@@ -168,13 +176,23 @@ func (r *rows) ColumnTypeScanType(index int) reflect.Type {
 		return reflect.TypeOf(true)
 	case C.DUCKDB_TYPE_DECIMAL:
 		return reflect.TypeOf(float64(0))
+	case C.DUCKDB_TYPE_UTINYINT:
+		return reflect.TypeOf(uint8(0))
 	case C.DUCKDB_TYPE_TINYINT:
 		return reflect.TypeOf(int8(0))
+	case C.DUCKDB_TYPE_USMALLINT:
+		return reflect.TypeOf(uint16(0))
 	case C.DUCKDB_TYPE_SMALLINT:
 		return reflect.TypeOf(int16(0))
+	case C.DUCKDB_TYPE_UINTEGER:
+		return reflect.TypeOf(uint(0))
 	case C.DUCKDB_TYPE_INTEGER:
 		return reflect.TypeOf(int(0))
+	case C.DUCKDB_TYPE_UBIGINT:
+		return reflect.TypeOf(uint64(0))
 	case C.DUCKDB_TYPE_BIGINT:
+		return reflect.TypeOf(int64(0))
+	case C.DUCKDB_TYPE_HUGEINT:
 		return reflect.TypeOf(int64(0))
 	case C.DUCKDB_TYPE_FLOAT:
 		return reflect.TypeOf(float32(0))
@@ -196,14 +214,24 @@ func (r *rows) ColumnTypeDatabaseTypeName(index int) string {
 	switch colType {
 	case C.DUCKDB_TYPE_BOOLEAN:
 		return "BOOLEAN"
+	case C.DUCKDB_TYPE_UTINYINT:
+		return "UTINYINT"
 	case C.DUCKDB_TYPE_TINYINT:
 		return "TINYINT"
+	case C.DUCKDB_TYPE_USMALLINT:
+		return "USMALLINT"
 	case C.DUCKDB_TYPE_SMALLINT:
 		return "SMALLINT"
+	case C.DUCKDB_TYPE_UINTEGER:
+		return "UINTEGER"
 	case C.DUCKDB_TYPE_INTEGER:
-		return "INT"
+		return "INTEGER"
+	case C.DUCKDB_TYPE_UBIGINT:
+		return "UBIGINT"
 	case C.DUCKDB_TYPE_BIGINT:
 		return "BIGINT"
+	case C.DUCKDB_TYPE_HUGEINT:
+		return "HUGEINT"
 	case C.DUCKDB_TYPE_FLOAT:
 		return "FLOAT"
 	case C.DUCKDB_TYPE_DOUBLE:
