@@ -14,7 +14,6 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"net/url"
 	"unsafe"
 )
 
@@ -28,7 +27,8 @@ func (impl) Open(dataSourceName string) (driver.Conn, error) {
 	var db C.duckdb_database
 	var con C.duckdb_connection
 
-	parsedDSN, err := url.Parse(dataSourceName)
+	// parsedDSN, err := url.Parse(dataSourceName)
+	parsedDSN, err := ParseDSN(dataSourceName)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", parseConfigError, err.Error())
 	}
@@ -37,7 +37,7 @@ func (impl) Open(dataSourceName string) (driver.Conn, error) {
 	defer C.free(unsafe.Pointer(path))
 
 	// Check for config options.
-	if len(parsedDSN.RawQuery) == 0 {
+	if len(parsedDSN.Params) == 0 {
 		var nullConfig C.duckdb_config
 		errMsg := C.CString("")
 		defer C.duckdb_free(unsafe.Pointer(errMsg))
@@ -45,7 +45,7 @@ func (impl) Open(dataSourceName string) (driver.Conn, error) {
 			return nil, fmt.Errorf("%w: %s", openError, C.GoString(errMsg))
 		}
 	} else {
-		config, err := prepareConfig(parsedDSN.Query())
+		config, err := prepareConfig(parsedDSN.Params)
 		if err != nil {
 			return nil, err
 		}
